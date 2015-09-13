@@ -1,0 +1,12 @@
+#
+# Cookbook Name:: vim
+# Recipe:: default
+#
+# Copyright 2015, YOUR_COMPANY_NAME
+#
+# All rights reserved - Do Not Redistribute
+#
+#install vim
+
+#include_recipe 'java'
+package "vim" 
