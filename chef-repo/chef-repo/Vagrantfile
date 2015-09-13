@@ -1,0 +1,67 @@
+#/usr/bin/env ruby
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+dir_pwd = Dir.pwd
+dir_chef_repo = dir_pwd
+dir_chef = "#{dir_chef_repo}/.chef"
+# dir_cookbooks = "#{dir_pwd}/cookbooks"
+dir_cookbooks = "#{dir_pwd}/cookbooks"
+dir_roles = "#{dir_pwd}/roles"
+dir_nodes = "#{dir_pwd}/nodes"
+chef_org_name = "hewlett"
+chef_node_name = "kalapriya_kannan"
+
+REPOSITORY_IP = "http://192.168.3.8:8080/"
+
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu-1404"
+  config.ssh.pty = true
+  config.vm.box_url = "#{REPOSITORY_IP}/pkg/boxes/ubuntu-14.04_chef-provisioner.box"
+
+#  config.vbguest.auto_update = false
+#  config.vbguest.no_remote = true
+
+  # For Redhat, Centos, Fedora, etc
+  # config.vm.provision :shell, :inline => "command -v yum >/dev/null 2>&1 && sudo yum install curl -y && sudo rpm -ivh #{REPOSITORY_IP/chef-11.18.12-1.el6.x86_64.rpm}"
+  # config.vm.provision :shell, :inline => "command -v knife >/dev/null 2>&1 || sudo rpm -ivh #{REPOSITORY_IP}/rpm/chef-11.18.12-1.el6.x86_64.rpm"
+
+  # For Ubuntu
+  # config.vm.provision :shell, :inline => "command -v apt-get >/dev/null 2>&1 && sudo apt-get update -y && sudo apt-get install curl -y"
+  # config.vm.provision :shell, :inline => "command -v knife >/dev/null 2>&1 || wget #{REPOSITORY_IP}/ubuntu/chef_11.18.12-1_i386.deb || sudo dpkg -i chef_11.18.12-1_i386.deb"
+
+  # VM Configuration
+
+  config.vm.define :dev_solo do |vm_config|
+    vm_config.vm.hostname = "my-dev-machine"
+
+    vm_config.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", 512]
+      vb.gui = true
+    end
+
+    vm_config.vm.network :forwarded_port, guest: 80, host: 8888
+
+    # Provisioner configuration
+
+    vm_config.vm.provision "chef_client" do |chef|
+      # chef.log_level = ENV['CHEF_LOG'] || 'debug'
+      chef.install = false
+      chef.delete_node = true
+      chef.delete_client = true
+      chef.environment = "kalapriya"
+      chef.validation_client_name = "hewlett-validator"
+      chef.chef_server_url = "https://api.opscode.com/organizations/hewlett"
+      chef.validation_key_path = ".chef/hewlett-validator.pem"
+
+      # Add a recipe
+      # chef.add_recipe 'apache'
+      chef.add_recipe 'vim'
+      chef.add_recipe 'apacheserver'
+
+      # Add a role
+      # chef.add_role 'web'
+    end
+
+  end
+end
