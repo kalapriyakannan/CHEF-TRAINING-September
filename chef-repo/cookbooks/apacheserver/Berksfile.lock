@@ -1,0 +1,9 @@
+DEPENDENCIES
+  apacheserver
+    path: .
+    metadata: true
+
+GRAPH
+  apacheserver (0.1.6)
+    java (~> 1.35.0)
+  java (1.35.0)

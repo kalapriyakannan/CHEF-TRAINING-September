@@ -19,12 +19,16 @@ service "apache2" do
 	action [ :enable, :start ]
 end
 
+users = data_bag('system_users')
+adminvalues = data_bag_item('system_users','admin')
+role = adminvalues['role']
 
 
 template "/var/www/html/index.html" do
 	source "index.htm.erb"
 	variables({
 		:myuser => "Kalapriya",
-		:anotherway => node['apache2']['whoami']
+		:anotherway => node['apache2']['whoami'],
+		:databagvalue => role
 		})
 end
